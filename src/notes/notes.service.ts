@@ -23,40 +23,39 @@ export class NotesService {
     });
 
     if (!note) {
-      throw new NotFoundException('Note not found');
+      throw new NotFoundException('User not found');
     }
 
     return note;
   }
 
   async create(createNoteDto: CreateNoteDto) {
-    const newNote = {
+    const noteData = {
       ...createNoteDto,
       read: false,
       date: new Date(),
     };
 
-    const note = this.notesRepository.create(newNote);
-    return this.notesRepository.save(note);
+    const newNote = this.notesRepository.create(noteData);
+    return this.notesRepository.save(newNote);
   }
 
   async update(id: number, updateNoteDto: UpdateNoteDto) {
-    const partialUpdateNoteDto = {
+    const partialUpdateNote = {
       read: updateNoteDto?.read,
       text: updateNoteDto?.text,
     };
 
     const note = await this.notesRepository.preload({
       id,
-      ...partialUpdateNoteDto,
+      ...partialUpdateNote,
     });
 
     if (!note) {
       throw new NotFoundException('Note not found');
     }
 
-    const updatedNote = await this.notesRepository.save(note);
-    return updatedNote;
+    return await this.notesRepository.save(note);
   }
 
   async remove(id: number) {
