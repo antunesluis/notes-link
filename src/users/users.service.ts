@@ -8,6 +8,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,8 +36,12 @@ export class UsersService {
     }
   }
 
-  async findAll() {
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
     const users = await this.usersRepository.find({
+      take: limit,
+      skip: offset,
       order: {
         id: 'ASC',
       },
@@ -51,7 +56,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('Note not found');
+      throw new NotFoundException('User not found');
     }
 
     return user;
@@ -59,7 +64,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const partialUpdateUser = {
-      nome: updateUserDto?.name,
+      name: updateUserDto?.name,
       passwordHash: updateUserDto?.password,
     };
 

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsPositive, IsString, MinLength } from 'class-validator';
 
 export class CreateNoteDto {
   @IsString()
@@ -6,11 +6,9 @@ export class CreateNoteDto {
   @MinLength(5)
   readonly text: string;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly from: string;
+  @IsPositive()
+  fromId: number;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly to: string;
+  @IsPositive()
+  toId: number;
 }

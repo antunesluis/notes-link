@@ -1,7 +1,10 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,12 +17,6 @@ export class Note {
   @Column({ type: 'varchar' })
   text: string;
 
-  @Column({ type: 'varchar' })
-  from: string;
-
-  @Column({ type: 'varchar' })
-  to: string;
-
   @Column({ default: false })
   read: boolean;
 
@@ -31,4 +28,16 @@ export class Note {
 
   @UpdateDateColumn()
   updatedAt?: Date;
+
+  // Many notes can be sent by one user
+  @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  // The column that will be used to reference the id of the user that sent the note
+  @JoinColumn({ name: 'from' })
+  from: User;
+
+  // Many notes can be sent to one user
+  @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  // The column that will be used to reference the id of the user that sent the note
+  @JoinColumn({ name: 'to' })
+  to: User;
 }

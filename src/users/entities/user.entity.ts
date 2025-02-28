@@ -1,8 +1,10 @@
 import { IsEmail } from 'class-validator';
+import { Note } from 'src/notes/entities/note.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -27,4 +29,12 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt?: Date;
+
+  // one user can send many notes
+  @OneToMany(() => Note, note => note.from)
+  notesSent: Note[];
+
+  // one user can receive many notes
+  @OneToMany(() => Note, note => note.to)
+  notesReceived: Note[];
 }
