@@ -15,15 +15,13 @@ export class ParseIntIdPipe implements PipeTransform {
     const parsedValue = Number(value);
 
     if (isNaN(parsedValue)) {
-      throw new BadRequestException(
-        'Validation failed (numeric string is expected)',
-      );
+      throw new BadRequestException('ID must be a positive numeric string');
     }
 
     if (parsedValue <= 0) {
-      throw new BadRequestException(
-        'Validation failed (positive ID number is expected)',
-      );
+      throw new BadRequestException('ID must be a positive number');
     }
+
+    return parsedValue;
   }
 }
