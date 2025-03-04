@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Note } from './entities/note.entity';
-import { CreateNoteDto } from './dto/create-note.dto';
-import { UpdateNoteDto } from './dto/update-note.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UsersService } from 'src/users/users.service';
+
+import { CreateNoteDto } from './dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-note.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { UsersService } from 'src/users/users.service';
+import { Note } from './entities/note.entity';
 
 @Injectable()
 export class NotesService {
