@@ -7,12 +7,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import jwtConfig from './config/jwt.config';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 @Global()
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     ConfigModule.forFeature(jwtConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
   ],
   providers: [
     AuthService,
@@ -21,7 +23,7 @@ import { ConfigModule } from '@nestjs/config';
       useClass: BcryptService,
     },
   ],
-  exports: [HashingService],
   controllers: [AuthController],
+  exports: [HashingService, JwtModule, ConfigModule],
 })
 export class AuthModule {}
