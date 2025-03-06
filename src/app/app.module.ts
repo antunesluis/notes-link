@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from 'src/auth/auth.module';
 import { NotesModule } from 'src/notes/notes.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -42,6 +43,7 @@ import appConfig, { appConfigValidationSchema } from './app.config';
     // Feature Modules
     NotesModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

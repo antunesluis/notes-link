@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { HashingService } from 'src/auth/hashing/hashing.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -16,14 +17,19 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly hashingService: HashingService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
+      const passwordHash = await this.hashingService.hash(
+        createUserDto.password,
+      );
+
       const userData = {
         name: createUserDto.name,
         email: createUserDto.email,
-        passwordHash: createUserDto.password,
+        passwordHash,
       };
 
       const newUser = this.usersRepository.create(userData);
@@ -66,8 +72,14 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     const partialUpdateUser = {
       name: updateUserDto?.name,
-      passwordHash: updateUserDto?.password,
     };
+
+    if (updateUserDto?.password) {
+      const passwordHash = await this.hashingService.hash(
+        updateUserDto.password,
+      );
+      partialUpdateUser['passwordHash'] = passwordHash;
+    }
 
     const user = await this.usersRepository.preload({
       id,
