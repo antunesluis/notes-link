@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { User } from './entities/user.entity';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 
 @Injectable()
 export class UsersService {
@@ -69,7 +71,11 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    tokenPayload: TokenPayloadDto,
+  ) {
     const partialUpdateUser = {
       name: updateUserDto?.name,
     };
@@ -90,16 +96,24 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
+    if (user.id !== tokenPayload.sub) {
+      throw new ForbiddenException('You can only update your own user');
+    }
+
     return this.usersRepository.save(user);
   }
 
-  async remove(id: number) {
+  async remove(id: number, tokenPayload: TokenPayloadDto) {
     const user = await this.usersRepository.findOneBy({
       id,
     });
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    if (user.id !== tokenPayload.sub) {
+      throw new ForbiddenException('You can only delete your own user');
     }
 
     return this.usersRepository.remove(user);

@@ -7,6 +7,7 @@ import { UpdateNoteDto } from './dto/update-note.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UsersService } from 'src/users/users.service';
 import { Note } from './entities/note.entity';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 
 @Injectable()
 export class NotesService {
@@ -63,10 +64,10 @@ export class NotesService {
     return note;
   }
 
-  async create(createNoteDto: CreateNoteDto) {
-    const { fromId, toId } = createNoteDto;
+  async create(createNoteDto: CreateNoteDto, tokenPayload: TokenPayloadDto) {
+    const { fromId } = createNoteDto;
     const from = await this.usersService.findOne(fromId);
-    const to = await this.usersService.findOne(toId);
+    const to = await this.usersService.findOne(tokenPayload.sub);
 
     const noteData = {
       text: createNoteDto.text,
@@ -92,7 +93,11 @@ export class NotesService {
     };
   }
 
-  async update(id: number, updateNoteDto: UpdateNoteDto) {
+  async update(
+    id: number,
+    updateNoteDto: UpdateNoteDto,
+    tokenPayload: TokenPayloadDto,
+  ) {
     const note = await this.findOne(id);
 
     note.text = updateNoteDto?.text ?? note.text;
@@ -101,7 +106,7 @@ export class NotesService {
     return await this.notesRepository.save(note);
   }
 
-  async remove(id: number) {
+  async remove(id: number, tokenPayload: TokenPayloadDto) {
     const note = await this.notesRepository.findOneBy({ id });
 
     if (!note) {
