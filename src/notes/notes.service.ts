@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -65,9 +69,13 @@ export class NotesService {
   }
 
   async create(createNoteDto: CreateNoteDto, tokenPayload: TokenPayloadDto) {
-    const { fromId } = createNoteDto;
-    const from = await this.usersService.findOne(fromId);
-    const to = await this.usersService.findOne(tokenPayload.sub);
+    const { toId } = createNoteDto;
+
+    // find the user that will receive the note
+    const to = await this.usersService.findOne(toId);
+
+    // find the user that sent the note
+    const from = await this.usersService.findOne(tokenPayload.sub);
 
     const noteData = {
       text: createNoteDto.text,
@@ -100,6 +108,14 @@ export class NotesService {
   ) {
     const note = await this.findOne(id);
 
+    if (!note) {
+      throw new NotFoundException('Note not found');
+    }
+
+    if (note.from.id !== tokenPayload.sub) {
+      throw new ForbiddenException('this note is not yours');
+    }
+
     note.text = updateNoteDto?.text ?? note.text;
     note.read = updateNoteDto?.read ?? note.read;
 
@@ -107,10 +123,10 @@ export class NotesService {
   }
 
   async remove(id: number, tokenPayload: TokenPayloadDto) {
-    const note = await this.notesRepository.findOneBy({ id });
+    const note = await this.findOne(id);
 
-    if (!note) {
-      throw new NotFoundException('Note not found');
+    if (note.from.id !== tokenPayload.sub) {
+      throw new ForbiddenException('this note is not yours');
     }
 
     return this.notesRepository.remove(note);
