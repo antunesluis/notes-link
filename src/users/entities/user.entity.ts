@@ -37,4 +37,7 @@ export class User {
   // one user can receive many notes
   @OneToMany(() => Note, note => note.to)
   notesReceived: Note[];
+
+  @Column({ default: true })
+  active: boolean;
 }
