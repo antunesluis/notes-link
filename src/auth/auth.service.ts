@@ -12,12 +12,14 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly hashingService: HashingService,
+    private readonly jwtService: JwtService,
+
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly hashingService: HashingService,
+
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
-    private readonly jwtService: JwtService,
   ) {}
 
   private async createTokens(user: User) {
