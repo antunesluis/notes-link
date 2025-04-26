@@ -43,9 +43,12 @@ export class UsersService {
 
       return newUser;
     } catch (error) {
+      // Unique violation error code for PostgreSQL
       if (error.code === '23505') {
         throw new ConflictException('User with this email already exists');
       }
+
+      throw error;
     }
   }
 
@@ -64,8 +67,8 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.usersRepository.findOne({
-      where: { id },
+    const user = await this.usersRepository.findOneBy({
+      id,
     });
 
     if (!user) {
