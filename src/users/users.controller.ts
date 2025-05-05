@@ -10,9 +10,6 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
   ParseFilePipeBuilder,
   HttpStatus,
 } from '@nestjs/common';

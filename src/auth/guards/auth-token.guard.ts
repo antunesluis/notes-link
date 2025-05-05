@@ -40,7 +40,6 @@ export class AuthTokenGuard implements CanActivate {
         token,
         this.jwtConfiguration,
       );
-
       const user = await this.userRepository.findOneBy({
         id: payload.sub,
         active: true,

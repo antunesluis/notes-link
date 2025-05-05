@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from 'src/auth/auth.module';
 import { NotesModule } from 'src/notes/notes.module';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/users/users.module';
 import { ConfigModule, ConfigType } from '@nestjs/config';
@@ -53,6 +52,5 @@ import appConfig, { appConfigValidationSchema } from './app.config';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

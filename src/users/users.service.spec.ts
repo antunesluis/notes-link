@@ -242,12 +242,20 @@ describe('UsersService', () => {
     });
 
     it('should throw NotFoundException if user does not exist', async () => {
-      const otherTokenPayload = { ...mockTokenPayload, sub: 2 };
       jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(null);
 
       await expect(
-        userService.remove(mockUser.id, otherTokenPayload),
+        userService.remove(mockUser.id, mockTokenPayload),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ForbiddenException when updating another user ', async () => {
+      const otherTokenPayload = { ...mockTokenPayload, sub: 2 };
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(mockUser);
+
+      await expect(
+        userService.remove(mockUser.id, otherTokenPayload),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
