@@ -8,6 +8,7 @@ import jwtConfig from './config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { TokenResponseDto } from './dto/token-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +55,7 @@ export class AuthService {
     return accessToken;
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto): Promise<TokenResponseDto> {
     const user = await this.userRepository.findOneBy({
       email: loginDto.email,
       active: true,
@@ -76,7 +77,9 @@ export class AuthService {
     return this.createTokens(user);
   }
 
-  async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+  async refreshTokens(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<TokenResponseDto> {
     try {
       const { sub } = await this.jwtService.verifyAsync(
         refreshTokenDto.refreshToken,

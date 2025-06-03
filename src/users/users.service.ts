@@ -14,6 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { User } from './entities/user.entity';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import { ResponseUserDto } from './dto/response-user.dto';
 
 import * as path from 'path';
 import * as fs from 'fs/promises';
@@ -26,7 +27,7 @@ export class UsersService {
     private readonly hashingService: HashingService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
     try {
       const passwordHash = await this.hashingService.hash(
         createUserDto.password,
@@ -52,7 +53,7 @@ export class UsersService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: PaginationDto): Promise<ResponseUserDto[]> {
     const { limit = 10, offset = 0 } = paginationDto;
 
     const users = await this.usersRepository.find({
@@ -66,7 +67,7 @@ export class UsersService {
     return users;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<ResponseUserDto> {
     const user = await this.usersRepository.findOneBy({
       id,
     });
@@ -82,7 +83,7 @@ export class UsersService {
     id: number,
     updateUserDto: UpdateUserDto,
     tokenPayload: TokenPayloadDto,
-  ) {
+  ): Promise<ResponseUserDto> {
     const partialUpdateUser = {
       name: updateUserDto?.name,
     };
@@ -110,7 +111,10 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async remove(id: number, tokenPayload: TokenPayloadDto) {
+  async remove(
+    id: number,
+    tokenPayload: TokenPayloadDto,
+  ): Promise<ResponseUserDto> {
     const user = await this.usersRepository.findOneBy({
       id,
     });
@@ -123,7 +127,9 @@ export class UsersService {
       throw new ForbiddenException('You can only delete your own user');
     }
 
-    return this.usersRepository.remove(user);
+    await this.usersRepository.delete(user.id);
+
+    return user;
   }
 
   async uploadPicture(

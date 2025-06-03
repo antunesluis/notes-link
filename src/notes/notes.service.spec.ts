@@ -75,6 +75,7 @@ describe('NotesService', () => {
             findOne: jest.fn(),
             create: jest.fn(),
             save: jest.fn(),
+            delete: jest.fn(),
             remove: jest.fn(),
             preload: jest.fn(),
           },
@@ -252,12 +253,14 @@ describe('NotesService', () => {
   describe('remove', () => {
     it('should remove a note', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(mockNote);
-      jest.spyOn(notesRepository, 'remove').mockResolvedValue(mockNote);
+      jest
+        .spyOn(notesRepository, 'delete')
+        .mockResolvedValue({ raw: [], affected: 1 });
 
       const result = await service.remove(mockNote.id, mockTokenPayload);
 
       expect(service.findOne).toHaveBeenCalledWith(mockNote.id);
-      expect(notesRepository.remove).toHaveBeenCalledWith(mockNote);
+      expect(notesRepository.delete).toHaveBeenCalledWith(mockNote.id);
       expect(result).toEqual(mockNote);
     });
 

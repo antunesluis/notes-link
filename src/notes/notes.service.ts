@@ -12,6 +12,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UsersService } from 'src/users/users.service';
 import { Note } from './entities/note.entity';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import { ResponseNoteDto } from './dto/response-note.dto';
 
 @Injectable()
 export class NotesService {
@@ -21,7 +22,7 @@ export class NotesService {
     private readonly usersService: UsersService,
   ) {}
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: PaginationDto): Promise<ResponseNoteDto[]> {
     const { limit = 10, offset = 0 } = paginationDto;
 
     const notes = await this.notesRepository.find({
@@ -45,7 +46,7 @@ export class NotesService {
     return notes;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<ResponseNoteDto> {
     const note = await this.notesRepository.findOne({
       where: { id },
       relations: ['from', 'to'],
@@ -68,7 +69,10 @@ export class NotesService {
     return note;
   }
 
-  async create(createNoteDto: CreateNoteDto, tokenPayload: TokenPayloadDto) {
+  async create(
+    createNoteDto: CreateNoteDto,
+    tokenPayload: TokenPayloadDto,
+  ): Promise<ResponseNoteDto> {
     const { toId } = createNoteDto;
 
     // find the user that will receive the note
@@ -79,8 +83,8 @@ export class NotesService {
 
     const noteData = {
       text: createNoteDto.text,
-      to: to,
-      from: from,
+      to,
+      from,
       read: false,
       date: new Date(),
     };
@@ -105,7 +109,7 @@ export class NotesService {
     id: number,
     updateNoteDto: UpdateNoteDto,
     tokenPayload: TokenPayloadDto,
-  ) {
+  ): Promise<ResponseNoteDto> {
     const note = await this.findOne(id);
 
     if (!note) {
@@ -122,13 +126,17 @@ export class NotesService {
     return await this.notesRepository.save(note);
   }
 
-  async remove(id: number, tokenPayload: TokenPayloadDto) {
+  async remove(
+    id: number,
+    tokenPayload: TokenPayloadDto,
+  ): Promise<ResponseNoteDto> {
     const note = await this.findOne(id);
 
     if (note.from.id !== tokenPayload.sub) {
       throw new ForbiddenException('this note is not yours');
     }
+    await this.notesRepository.delete(note.id);
 
-    return this.notesRepository.remove(note);
+    return note;
   }
 }

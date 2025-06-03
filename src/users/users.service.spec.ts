@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 import { Repository } from 'typeorm';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
@@ -64,6 +62,7 @@ describe('UsersService', () => {
             find: jest.fn(),
             preload: jest.fn(),
             remove: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -230,14 +229,16 @@ describe('UsersService', () => {
   describe('remove', () => {
     it('should remove a user', async () => {
       jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(mockUser);
-      jest.spyOn(userRepository, 'remove').mockResolvedValue(mockUser);
+      jest
+        .spyOn(userRepository, 'delete')
+        .mockResolvedValue({ raw: [], affected: 1 });
 
       const result = await userService.remove(mockUser.id, mockTokenPayload);
 
       expect(userRepository.findOneBy).toHaveBeenCalledWith({
         id: mockUser.id,
       });
-      expect(userRepository.remove).toHaveBeenCalledWith(mockUser);
+      expect(userRepository.delete).toHaveBeenCalledWith(mockUser.id);
       expect(result).toEqual(mockUser);
     });
 
