@@ -3,6 +3,7 @@ import { AppModule } from './app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ParseIntIdPipe } from './common/pipes/parse-int-id.pipe';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,6 +29,16 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, documentBuilderConfig);
 
   SwaggerModule.setup('docs', app, document);
+
+  if (process.env.NODE_ENV === 'production') {
+    // Helmet to set secure HTTP headers in production
+    app.use(helmet());
+
+    // Enable CORS for a specific domain in production
+    app.enableCors({
+      origin: process.env.CORS_ALLOWED_ORIGINS,
+    });
+  }
 
   await app.listen(process.env.APP_PORT ?? 3000);
 }
