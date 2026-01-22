@@ -10,32 +10,25 @@
 A simple backend API for a messaging system between users, built with
 [NestJS](https://nestjs.com/) and [TypeORM](https://typeorm.io/).
 
----
-
 ## ✨ Features
 
 - **User Management**:
-
   - Register users with email and password
   - Login with JWT-based authentication
   - Update and delete user accounts
   - Upload profile pictures
 
 - **Notes System**:
-
   - Send and receive notes between users
   - Full CRUD operations for notes
 
 - **Security**:
-
   - Secure authentication using [JWT](https://jwt.io/)
   - Password hashing with [bcrypt](https://github.com/kelektiv/node.bcrypt.js)
 
 - **Developer Tools**:
   - Comprehensive [Swagger](https://swagger.io/) API documentation
   - Unit tests for all features using [Jest](https://jestjs.io/)
-
----
 
 ## 🛠 Tech Stack
 
@@ -46,8 +39,6 @@ A simple backend API for a messaging system between users, built with
 - [Bcrypt](https://github.com/kelektiv/node.bcrypt.js) – Password hashing
 - [Swagger](https://swagger.io/) – API documentation
 - [Jest](https://jestjs.io/) – Testing framework
-
----
 
 ## 📚 API Endpoints
 
@@ -75,8 +66,6 @@ header.
 - `GET /notes/{id}` – Get note details
 - `PATCH /notes/{id}` – Update a note
 - `DELETE /notes/{id}` – Delete a note
-
----
 
 ## 📄 License
 
